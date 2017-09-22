@@ -2,13 +2,67 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Chat Room</title>
-<script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
-<script>
-
-</script>
+<title>web socket</title>
 </head>
 <body>
-<script>document.write(location.href);</script>
+namespace:<span id="ns" style="font-weight:bold;"></span><br>
+<input type="text" id="msg_input" style="width:200px;">
+<button onclick="publishMessage();">語る</button>
+<div id="msg"></div>
+<div id="system_text"></div>
+<script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
+<script>
+var systemText = document.querySelector("#system_text");
+
+var roomId = location.pathname.replace("/chat/", "");
+document.querySelector("#ns").innerText = roomId;
+
+var websocketUrl = "http://localhost:8080/chat/" + roomId;
+var socket = io.connect(websocketUrl);
+
+socket.on("connected", function(name){});
+socket.on("publish", function(data){ addMessage(data.value);});
+socket.on("disconnect", function(){});
+socket.on("start typing", function(typinguser){
+	if(systemText.innerHTML.length === 0){
+		systemText.innerHTML += typinguser + 'が入力中';
+	}
+});
+socket.on("stop typing", function(){
+	systemText.innerHTML = "";
+});
+
+
+var msgArea = document.querySelector("#msg");
+var myName = Math.floor(Math.random()*100) + "さん";
+addMessage("貴方は" + myName + "として入室しました");
+start(myName);
+
+document.querySelector("#msg_input").addEventListener("keyup", function(){
+	socket.emit("start typing");
+});
+
+// 2.イベントに絡ませる関数の定義
+function start(name){
+	socket.emit("connected", name);
+}
+
+function publishMessage(){
+	var textInput = document.querySelector("#msg_input");
+	if(textInput.value.length){
+		var msg = "[" + myName + "] " + textInput.value;
+		socket.emit("publish", {value: msg});
+		textInput.value = "";
+	}
+
+	socket.emit("stop typing");
+}
+
+function addMessage(msg){
+	var domMsg = document.createElement("div");
+	domMsg.innerHTML = new Date().toLocaleTimeString() + " " + msg;
+	msgArea.appendChild(domMsg);
+}
+</script>
 </body>
 </html>
