@@ -7,13 +7,30 @@
 </head>
 <body>
 
-<section>
-ここにナビを表示する
+<section id="nav">
+<ul>
+	<li><a href="javascript:void(0);">チャットルーム1</a></li>
+	<li><a href="javascript:void(0);">チャットルーム2</a></li>
+</ul>
 </section>
 
-<section>
+<section id="chat">
 	<iframe src="/chat/hoge"></iframe>
 </section>
 
 </body>
+<style>
+section#nav {
+	width:20%;
+	float:left;
+}
+section#chat {
+	width:70%;
+	float:left;
+}
+section#chat iframe {
+	width:95%;
+	height:600px;
+}
+</style>
 </html>

@@ -1,18 +1,17 @@
 const port = "8080";
 const fs = require("fs");
 const server = require("http").createServer();
-server.on("request", function(request, response){
+server.on("request", function(req, res){
 	let fileName;
-	switch(request.url){
-		case "/chat":
-			fileName = "chat";
-			break;
-		default:
-			fileName = "index";
+	if(req.url.indexOf("/chat") === 0){
+		fileName = "chat";
+	}else{
+		fileName = "index";
 	}
+
 	var stream = fs.createReadStream("template/" + fileName + ".html");
-	response.writeHead(200, {"Content-Type":"text/html"});
-	stream.pipe(response);
+	res.writeHead(200, {"Content-Type":"text/html"});
+	stream.pipe(res);
 });
 server.listen(port);
 console.log("create server : " + port);
