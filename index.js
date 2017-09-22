@@ -20,7 +20,7 @@ console.log("create server : " + port);
 const io = require("socket.io").listen(server);
 
 //namespacesを２つにしてみる
-["hoge", "huga"].forEach(function(v){
+["hoge", "huga", "test"].forEach(function(v){
 	// ユーザ管理ハッシュ
 	var userHash = {};
 
@@ -36,13 +36,14 @@ const io = require("socket.io").listen(server);
 
 		// 接続開始のカスタムイベント(接続元ユーザを保存し、他ユーザへ通知)
 		socket.on("connected", function(name){
-			var msg = name + "が入室しました";
 			userHash[socket.id] = name;
-			chatNS.to(roomName).emit("pushlish", {value: msg});
 		});
 
 		// メッセージ送信カスタムイベント
 		socket.on("publish", function(data){
+			/** @ToDo データベースにメッセージを挿入する **/
+			//data.user_id;
+
 			chatNS.to(roomName).emit("publish", {value:xssFilters.inHTMLData(data.value)});
 		});
 
@@ -69,9 +70,7 @@ const io = require("socket.io").listen(server);
 		// 接続終了組み込みイベント(接続元ユーザを削除し、他ユーザへ通知)
 		socket.on("disconnect", function(){
 			if(userHash[socket.id]){
-				var msg = userHash[socket.id] + "が退出しました";
 				delete userHash[socket.id];
-				chatNS.to(roomName).emit("publish", {value: msg});
 			}
 		});
 	});

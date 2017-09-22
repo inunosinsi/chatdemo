@@ -6,10 +6,11 @@
 </head>
 <body>
 namespace:<span id="ns" style="font-weight:bold;"></span><br>
-<input type="text" id="msg_input" style="width:200px;">
-<button onclick="publishMessage();">語る</button>
 <div id="msg"></div>
 <div id="system_text"></div>
+<textarea id="msg_input"></textarea>
+<button onclick="publishMessage();">送信</button>
+<input type="hidden" id="user_id" value="1">
 <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
 <script>
 var systemText = document.querySelector("#system_text");
@@ -35,7 +36,7 @@ socket.on("stop typing", function(){
 
 var msgArea = document.querySelector("#msg");
 var myName = Math.floor(Math.random()*100) + "さん";
-addMessage("貴方は" + myName + "として入室しました");
+//addMessage("貴方は" + myName + "として入室しました");
 start(myName);
 
 document.querySelector("#msg_input").addEventListener("keyup", function(){
@@ -51,7 +52,8 @@ function publishMessage(){
 	var textInput = document.querySelector("#msg_input");
 	if(textInput.value.length){
 		var msg = "[" + myName + "] " + textInput.value;
-		socket.emit("publish", {value: msg});
+		var userId = parseInt(document.querySelector("#user_id").value);
+		socket.emit("publish", {user_id: userId, value: msg});
 		textInput.value = "";
 	}
 
