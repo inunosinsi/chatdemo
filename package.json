@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/inunosinsi/chatdemo/issues"
   },
-  "homepage": "https://github.com/inunosinsi/chatdemo#readme"
+  "homepage": "https://github.com/inunosinsi/chatdemo#readme",
+  "devDependencies": {
+    "sqlite3": "^3.1.11"
+  }
 }
