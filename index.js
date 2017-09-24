@@ -43,8 +43,13 @@ const io = require("socket.io").listen(server);
 
 		// メッセージ送信カスタムイベント
 		socket.on("publish", function(data){
-			/** @ToDo データベースにメッセージを挿入する **/
+
 			//data.user_id;
+			db.run("INSERT INTO message_table(room_id, user_id, content, send_date) VALUES('" + v + "', " + data.user_id + ", '" + data.value + "', '" + new Date().getTime() + "');", function(err, res){
+				if (err) {
+					console.error(err.message);
+				}
+			});
 
 			chatNS.to(roomName).emit("publish", {value:xssFilters.inHTMLData(data.value)});
 		});
