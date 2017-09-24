@@ -51,7 +51,7 @@ const io = require("socket.io").listen(server);
 				}
 			});
 
-			chatNS.to(roomName).emit("publish", {value:xssFilters.inHTMLData(data.value)});
+			chatNS.to(roomName).emit("publish", {value:"[" + data.user_id + "さん]" + xssFilters.inHTMLData(data.value)});
 		});
 
 		let nowTyping = 0;

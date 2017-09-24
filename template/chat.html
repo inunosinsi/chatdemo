@@ -34,25 +34,24 @@ socket.on("stop typing", function(){
 });
 
 var msgArea = document.querySelector("#msg");
-var myName = Math.floor(Math.random()*100) + "さん";
+var userId = Math.floor(Math.random()*100);
 //addMessage("貴方は" + myName + "として入室しました");
-start(myName);
+start(userId);
 
 document.querySelector("#msg_input").addEventListener("keyup", function(){
 	socket.emit("start typing");
 });
 
 // 2.イベントに絡ませる関数の定義
-function start(name){
-	socket.emit("connected", name);
+function start(userId){
+	socket.emit("connected", userId + "さん");
 }
 
 function publishMessage(){
 	var textInput = document.querySelector("#msg_input");
 	if(textInput.value.length){
-		var msg = "[" + myName + "] " + textInput.value;
-		var userId = parseInt(document.querySelector("#user_id").value);
-		socket.emit("publish", {user_id: userId, value: msg});
+		//var userId = parseInt(document.querySelector("#user_id").value);
+		socket.emit("publish", {user_id: userId, value: textInput.value});
 		textInput.value = "";
 	}
 
