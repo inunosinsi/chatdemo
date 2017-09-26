@@ -18,7 +18,7 @@ var systemText = document.querySelector("#system_text");
 var roomId = location.pathname.replace("/chat/", "");
 document.querySelector("#ns").innerText = roomId;
 
-var websocketUrl = "http://localhost:8081/chat/" + roomId;
+var websocketUrl = "http://" + location.hostname + ":8081/chat/" + roomId;
 var socket = io.connect(websocketUrl);
 
 socket.on("connected", function(name){});
