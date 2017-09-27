@@ -1,7 +1,8 @@
 const port = "8081";
 const fs = require("fs");
 const xssFilters = require('xss-filters');
-const db = require('./_module/db.js').init("./db/sqlite.db");
+
+const db = require(__dirname + '/_module/db.js').init(__dirname + "./db/sqlite.db");
 
 const server = require("http").createServer();
 server.on("request", function(req, res){
