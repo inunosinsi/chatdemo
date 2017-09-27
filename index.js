@@ -46,7 +46,7 @@ const io = require("socket.io").listen(server);
 		socket.on("publish", function(data){
 
 			//data.user_id;
-			db.run("INSERT INTO message_table(room_id, user_id, content, send_date) VALUES('" + v + "', " + data.user_id + ", '" + data.value + "', '" + new Date().getTime() + "');", function(err, res){
+			db.run("INSERT INTO message_table(room_id, user_id, content, send_date) VALUES('" + v + "', " + data.user_id + ", '" + data.value + "', '" + parseInt(Math.floor(new Date().getTime() / 1000)) + "');", function(err, res){
 				if (err) {
 					console.error(err.message);
 				}
