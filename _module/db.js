@@ -3,7 +3,7 @@ const SQLiteObject = {
 	init : function(file){
 		return new sqlite3.Database(file, function(err){
 			if(err){
-				//console.error(err.message);
+				console.error(err.message);
 			}
 		});
 	}
