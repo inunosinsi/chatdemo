@@ -23,12 +23,16 @@ console.log("create server : " + port);
 const io = require("socket.io").listen(server);
 
 //namespacesを２つにしてみる
-["hoge", "huga", "test"].forEach(function(v){
+["hoge", "huga", "test"].forEach(function(roomId){
+	connectChatRoom(roomId);
+});
+
+function connectChatRoom(roomId){
 	// ユーザ管理ハッシュ
 	var userHash = {};
 
 	// Namespacesを利用する
-	var chatNS = io.of('/chat/' + v);
+	var chatNS = io.of('/chat/' + roomId);
 	chatNS.on("connection", function(socket){
 
 		// Room(Namespacesで分けた時、roomも利用した方が良いみたい)
@@ -46,7 +50,7 @@ const io = require("socket.io").listen(server);
 		socket.on("publish", function(data){
 
 			//data.user_id;
-			db.run("INSERT INTO message_table(room_id, user_id, content, send_date) VALUES('" + v + "', " + data.user_id + ", '" + data.value + "', '" + parseInt(Math.floor(new Date().getTime() / 1000)) + "');", function(err, res){
+			db.run("INSERT INTO message_table(room_id, user_id, content, send_date) VALUES('" + roomId + "', " + data.user_id + ", '" + data.value + "', '" + parseInt(Math.floor(new Date().getTime() / 1000)) + "');", function(err, res){
 				if (err) {
 					console.error(err.message);
 				}
@@ -82,4 +86,4 @@ const io = require("socket.io").listen(server);
 			}
 		});
 	});
-});
+}
