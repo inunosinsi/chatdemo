@@ -1,30 +1,63 @@
 const port = "8081";
 const fs = require("fs");
 const xssFilters = require('xss-filters');
+const querystring = require('querystring');
 
 const db = require(__dirname + '/_module/db.js').init(__dirname + "/db/sqlite.db");
 
 const server = require("http").createServer();
 server.on("request", function(req, res){
-	let fileName;
-	if(req.url.indexOf("/chat") === 0){
-		fileName = "chat";
-	}else{
-		fileName = "index";
-	}
+	//ルームの作成
+	if(req.method == "POST"){
+		if(req.url.indexOf("/create") === 0){
+			//CORS
+			res.writeHead(200, {
+	    		'Content-Type':'application/json; charset=utf-8',
+	    		'Access-Control-Allow-Origin':'http://localhost:8091',
+	    		'Access-Control-Allow-Methods':'POST',
+	    		'Access-Control-Allow-Headers':'*'
+			});
 
-	var stream = fs.createReadStream("template/" + fileName + ".html");
-	res.writeHead(200, {"Content-Type":"text/html"});
-	stream.pipe(res);
+			//POSTを受け取る
+			let data = '';
+			//readableイベントが発火したらデータにリクエストボディのデータを追加
+			req.on('readable', function(chunk) {
+				let v = req.read();
+				if(v){
+					data += v;
+				}
+			});
+			//リクエストボディをすべて読み込んだらendイベントが発火する。
+			req.on('end', function() {
+				//パースする
+				querystring.parse(data);
+				res.end(data);
+
+				//POSTの値が取れたので、データベースに登録する
+			});
+		}
+	//ページの表示
+	}else{
+		let fileName;
+		if(req.url.indexOf("/chat") === 0){
+			fileName = "chat";
+		}else{
+			fileName = "index";
+		}
+
+		var stream = fs.createReadStream("template/" + fileName + ".html");
+		res.writeHead(200, {"Content-Type":"text/html"});
+		stream.pipe(res);
+	}
 });
 server.listen(port);
 console.log("create server : " + port);
 
 const io = require("socket.io").listen(server);
 
-//namespacesを２つにしてみる
-["hoge", "huga", "test"].forEach(function(roomId){
-	connectChatRoom(roomId);
+// アプリ起動時、データベースに格納されているroomIdを元に接続を試みる
+db.each("SELECT * FROM chatroom", [], function(err, res){
+	connectChatRoom(res.room_id)
 });
 
 function connectChatRoom(roomId){

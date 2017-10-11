@@ -10,13 +10,31 @@ const SQLiteObject = {
 }
 
 module.exports.init = function(file) {
-	var db = SQLiteObject.init(file);
+	let db = SQLiteObject.init(file);
 
 	db.run("SELECT * FROM message_table", function(err, res){
 		if(err){
-			db.run(require("fs").readFileSync("./_module/init.sql").toString(), function(err){
+			db.run(require("fs").readFileSync(__dirname + "/sql/init.sql").toString(), function(err){
 				if (err) {
 					console.error("CREATE ERROR : " + err.message);
+				}
+			});
+		}
+	});
+
+	db.run("SELECT * FROM chatroom", function(err, res){
+		if(err){
+			db.run(require("fs").readFileSync(__dirname + "/sql/room.sql").toString(), function(err){
+				if (err) {
+					console.error("CREATE ERROR : " + err.message);
+				} else {
+					["hoge", "huga", "test"].forEach(function(roomId){
+						db.run("INSERT INTO chatroom(room_id) VALUES('" + roomId + "');", function(err, res){
+							if (err) {
+								console.error(err.message);
+							}
+						});
+					});
 				}
 			});
 		}
