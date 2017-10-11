@@ -15,26 +15,40 @@ server.on("request", function(req, res){
 	    		'Content-Type':'application/json; charset=utf-8',
 	    		'Access-Control-Allow-Origin':'http://localhost:8091',
 	    		'Access-Control-Allow-Methods':'POST',
-	    		'Access-Control-Allow-Headers':'*'
+	    		'Access-Control-Allow-Headers':'*',
+				"Content-Type": "text/plain"
 			});
 
 			//POSTを受け取る
-			let data = '';
-			//readableイベントが発火したらデータにリクエストボディのデータを追加
-			req.on('readable', function(chunk) {
-				let v = req.read();
-				if(v){
-					data += v;
-				}
+			let data = "";
+			req.on("data", function(chunk) {
+				data += chunk;
 			});
-			//リクエストボディをすべて読み込んだらendイベントが発火する。
-			req.on('end', function() {
-				//パースする
+			req.on("end", function() {
 				querystring.parse(data);
-				res.end(data);
 
-				//POSTの値が取れたので、データベースに登録する
-			});
+				let params = {};
+				let values = data.split("&");
+				values.forEach(function(v){
+					let arr = v.split("=");
+					params[arr[0]] = arr[1];
+				});
+
+				//新たなチャットルームを作成
+				db.run("INSERT INTO chatroom(room_id) VALUES('" + params.roomId + "');", function(err, res){
+					if (err) {
+						console.error(err.message);
+					//エラーがなければ新たにコネクト
+					} else {
+						connectChatRoom(params.roomId);
+						//フロントに結果を返す
+					}
+				});
+
+				//ここでPromiseを利用する？
+				res.write("OK");
+				res.end();
+    		});
 		}
 	//ページの表示
 	}else{
